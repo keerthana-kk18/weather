@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import imgg from './images/cloudyyy.png';
 import { FaSearch } from "react-icons/fa";
-import { TiWeatherCloudy } from "react-icons/ti";
 import { WiSunrise } from "react-icons/wi";
 import { IoPartlySunnySharp } from "react-icons/io5";
 import { LuWind, LuSun, LuDroplet, LuEye } from "react-icons/lu";
@@ -24,10 +23,15 @@ const TemperatureWave = ({ forecastData }) => {
 
   const points = forecastData.map((item, i) => ({
     x: i * spacing,
-    y: height / 2 - ((item.main.temp - minTemp) / (maxTemp - minTemp || 1) - 0.5) * amplitude,
+    y:
+      height / 2 -
+      ((item.main.temp - minTemp) / (maxTemp - minTemp || 1) - 0.5) *
+        amplitude,
     temp: Math.round(item.main.temp),
     icon: item.weather[0].icon,
-    time: new Date(item.dt * 1000).toLocaleTimeString([], { hour: 'numeric' }),
+    time: new Date(item.dt * 1000).toLocaleTimeString([], {
+      hour: 'numeric',
+    }),
   }));
 
   const smoothing = 0.35;
@@ -37,30 +41,61 @@ const TemperatureWave = ({ forecastData }) => {
     const next = a[i + 1] || point;
     const dx = (next.x - prev.x) * smoothing;
     const dy = (next.y - prev.y) * smoothing;
-    const cp1x = prev.x + dx;
-    const cp1y = prev.y + dy;
-    const cp2x = point.x - dx;
-    const cp2y = point.y - dy;
-    return `${acc} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${point.x},${point.y}`;
+    return `${acc} C ${prev.x + dx},${prev.y + dy} ${
+      point.x - dx
+    },${point.y - dy} ${point.x},${point.y}`;
   }, "");
 
   return (
     <div className="relative md:absolute bottom-2 md:left-[550px] w-full md:w-[850px] h-[180px] animate-in fade-in duration-1000 mt-10 md:mt-0">
+      {/* temperature icons */}
       <div className="flex justify-between w-full absolute -top-16 px-4">
         {points.map((p, i) => (
           <div key={i} className="flex flex-col items-center text-white">
             <span className="text-xl font-light">{p.temp}°</span>
-            <img src={`http://openweathermap.org/img/wn/${p.icon}@2x.png`} className="w-12 h-12" alt="weather" />
+            <img
+              src={`http://openweathermap.org/img/wn/${p.icon}@2x.png`}
+              className="w-12 h-12"
+              alt="weather"
+            />
           </div>
         ))}
       </div>
+
+      {/* wave */}
       <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`}>
-        <path d={d} fill="none" stroke="rgba(255, 255, 255, 0.8)" strokeWidth="3" strokeLinecap="round" />
-        <g>
-          <circle cx={points[2].x} cy={points[2].y} r="6" fill="white" className="animate-pulse shadow-[0_0_10px_white]" />
-          <line x1={points[2].x} y1={points[2].y} x2={points[2].x} y2={height + 20} stroke="white" strokeDasharray="4 4" opacity="0.3" />
-        </g>
+        <path
+          d={d}
+          fill="none"
+          stroke="rgba(255, 255, 255, 0.8)"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+
+        {/* SAFE ACCESS */}
+        {points.length > 2 && (
+          <g>
+            <circle
+              cx={points[2].x}
+              cy={points[2].y}
+              r="6"
+              fill="white"
+              className="animate-pulse shadow-[0_0_10px_white]"
+            />
+            <line
+              x1={points[2].x}
+              y1={points[2].y}
+              x2={points[2].x}
+              y2={height + 20}
+              stroke="white"
+              strokeDasharray="4 4"
+              opacity="0.3"
+            />
+          </g>
+        )}
       </svg>
+
+      
       <div className="flex justify-between w-full mt-4 px-4 text-white/60 text-xs font-medium uppercase tracking-widest">
         {points.map((p, i) => <span key={i}>{p.time}</span>)}
       </div>
