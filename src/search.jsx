@@ -223,7 +223,6 @@ const Search = () => {
               </div>
             </div>
 
-            {/* RESTORED SUNRISE & SUNSET SECTION */}
             <div className="bg-transparent backdrop-blur-xl border border-white/30 rounded-3xl p-5 w-[260px] text-white relative">
               <div className="flex items-center gap-2 mb-4">
                 <LuSun size={18} className="opacity-70" />
